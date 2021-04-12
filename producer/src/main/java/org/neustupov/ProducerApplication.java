@@ -1,13 +1,17 @@
 package org.neustupov;
 
+import lombok.extern.slf4j.Slf4j;
 import org.neustupov.producer.MessageProducer;
 import org.neustupov.service.ApiService;
 import org.neustupov.service.ApiServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+@Slf4j
+@EnableKafka
 @EnableScheduling
 @SpringBootApplication
 public class ProducerApplication {
@@ -28,8 +32,6 @@ public class ProducerApplication {
     producer.asynchSendMessage(service.getWeather());
 
     //Асинхронная отправка с санкаренси интерфейсами спринга
-    producer.asynchSendMessageWithSpringInterfaces(service.getWeather());
-    SpringApplication.run(ProducerApplication.class, args);
+    log.info(producer.asynchSendMessageWithSpringInterfaces(service.getWeather()).toString());
   }
-
 }

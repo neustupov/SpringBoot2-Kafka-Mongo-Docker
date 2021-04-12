@@ -1,7 +1,7 @@
 package org.neustupov.producer;
 
 import java.util.concurrent.ExecutionException;
-import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -16,17 +16,16 @@ import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
-@NoArgsConstructor
 @Component
 public class MessageProducer {
 
-  private KafkaProducer<String, Weather> kafkaProducer;
-  private KafkaTemplate<String, Weather> kafkaTemplate;
+  private final KafkaProducer<String, Weather> kafkaProducer;
+  private final KafkaTemplate<String, Weather> kafkaTemplate;
   @Value(value = "${kafka.topic.name}")
   private String topicName;
 
-  public MessageProducer(
-      KafkaTemplate<String, Weather> kafkaTemplate) {
+  public MessageProducer(KafkaProducer<String, Weather> kafkaProducer, KafkaTemplate<String, Weather> kafkaTemplate) {
+    this.kafkaProducer = kafkaProducer;
     this.kafkaTemplate = kafkaTemplate;
   }
 
@@ -49,7 +48,8 @@ public class MessageProducer {
     kafkaProducer.send(record, new SimpleProducerCallback());
   }
 
-  public void asynchSendMessageWithSpringInterfaces(Weather weather) {
+  @SneakyThrows
+  public SendResult<String, Weather> asynchSendMessageWithSpringInterfaces(Weather weather) {
     ListenableFuture<SendResult<String, Weather>> future = kafkaTemplate.send(topicName, weather);
 
     future.addCallback(new ListenableFutureCallback<SendResult<String, Weather>>() {
@@ -63,9 +63,11 @@ public class MessageProducer {
         log.info("Sent Message = {} with offset = {}", weather, stringDataSendResult.getRecordMetadata().offset());
       }
     });
+
+    return future.get();
   }
 
-  private class SimpleProducerCallback implements Callback {
+  private static class SimpleProducerCallback implements Callback {
 
     @Override
     public void onCompletion(RecordMetadata recordMetadata, Exception e) {
