@@ -8,11 +8,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Slf4j
 @EnableKafka
-@EnableScheduling
 @SpringBootApplication
 public class ProducerApplication {
 
@@ -31,7 +29,7 @@ public class ProducerApplication {
     //Асинхронная отправка
     producer.asynchSendMessage(service.getWeather());
 
-    //Асинхронная отправка с санкаренси интерфейсами спринга
-    log.info(producer.asynchSendMessageWithSpringInterfaces(service.getWeather()).toString());
+    //Асинхронная отправка с канкаренси интерфейсами спринга
+    producer.asynchSendMessageWithSpringInterfaces(service.getWeather());
   }
 }

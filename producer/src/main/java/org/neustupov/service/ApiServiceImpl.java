@@ -12,10 +12,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApiServiceImpl implements ApiService{
 
-  RestTemplate restTemplate;
-  String apiUrl;
-  String apiKey;
-  String location;
+  final RestTemplate restTemplate;
+  final String apiUrl;
+  final String apiKey;
+  final String location;
 
   public ApiServiceImpl(RestTemplate restTemplate,
       @Value("${api_url}") String apiUrl,

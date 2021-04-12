@@ -49,7 +49,7 @@ public class MessageProducer {
   }
 
   @SneakyThrows
-  public SendResult<String, Weather> asynchSendMessageWithSpringInterfaces(Weather weather) {
+  public void asynchSendMessageWithSpringInterfaces(Weather weather) {
     ListenableFuture<SendResult<String, Weather>> future = kafkaTemplate.send(topicName, weather);
 
     future.addCallback(new ListenableFutureCallback<SendResult<String, Weather>>() {
@@ -63,8 +63,6 @@ public class MessageProducer {
         log.info("Sent Message = {} with offset = {}", weather, stringDataSendResult.getRecordMetadata().offset());
       }
     });
-
-    return future.get();
   }
 
   private static class SimpleProducerCallback implements Callback {
