@@ -18,7 +18,17 @@ public class ProducerApplication {
     MessageProducer producer = context.getBean(MessageProducer.class);
     ApiService service = context.getBean(ApiServiceImpl.class);
 
-    producer.sendMessage(service.getWeather());
+    //Простая отправка
+    producer.simpleSendMessage(service.getWeather());
+
+    //Синхронная отправка
+    producer.synchSendMessage(service.getWeather());
+
+    //Асинхронная отправка
+    producer.asynchSendMessage(service.getWeather());
+
+    //Асинхронная отправка с санкаренси интерфейсами спринга
+    producer.asynchSendMessageWithSpringInterfaces(service.getWeather());
     SpringApplication.run(ProducerApplication.class, args);
   }
 

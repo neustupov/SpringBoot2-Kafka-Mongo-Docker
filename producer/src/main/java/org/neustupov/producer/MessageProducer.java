@@ -1,7 +1,12 @@
 package org.neustupov.producer;
 
+import java.util.concurrent.ExecutionException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.neustupov.model.Weather;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,6 +20,7 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Component
 public class MessageProducer {
 
+  private KafkaProducer<String, Weather> kafkaProducer;
   private KafkaTemplate<String, Weather> kafkaTemplate;
   @Value(value = "${kafka.topic.name}")
   private String topicName;
@@ -24,7 +30,26 @@ public class MessageProducer {
     this.kafkaTemplate = kafkaTemplate;
   }
 
-  public void sendMessage(Weather weather) {
+  public void simpleSendMessage(Weather weather){
+    ProducerRecord<String, Weather> record = new ProducerRecord<>(topicName, weather);
+    kafkaProducer.send(record);
+  }
+
+  public void synchSendMessage(Weather weather){
+    ProducerRecord<String, Weather> record = new ProducerRecord<>(topicName, weather);
+    try {
+      kafkaProducer.send(record).get();
+    } catch (InterruptedException | ExecutionException e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+
+  public void asynchSendMessage(Weather weather){
+    ProducerRecord<String, Weather> record = new ProducerRecord<>(topicName, weather);
+    kafkaProducer.send(record, new SimpleProducerCallback());
+  }
+
+  public void asynchSendMessageWithSpringInterfaces(Weather weather) {
     ListenableFuture<SendResult<String, Weather>> future = kafkaTemplate.send(topicName, weather);
 
     future.addCallback(new ListenableFutureCallback<SendResult<String, Weather>>() {
@@ -38,5 +63,15 @@ public class MessageProducer {
         log.info("Sent Message = {} with offset = {}", weather, stringDataSendResult.getRecordMetadata().offset());
       }
     });
+  }
+
+  private class SimpleProducerCallback implements Callback {
+
+    @Override
+    public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+      if (e != null){
+        log.error(e.getMessage(), e);
+      }
+    }
   }
 }
