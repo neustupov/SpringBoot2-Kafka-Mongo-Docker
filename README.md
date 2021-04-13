@@ -9,7 +9,8 @@ For start Zookeeper and Apache Kafka use start-zoo-kafka.bat
 For build producer: 
 ```sh
 docker build -t producer-img . 
-&& docker run -p 9090:9092 --name producer producer-img
+&& 
+docker run -p 9090:9092 --name producer producer-img
 ```
 
 Check messages in Kafka: 
