@@ -12,6 +12,18 @@ docker build
 && docker run 
 -p 9090:9092
 --name producer
-producer-img 
+producer-img
 
 For check messages in Kafka use: kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic topic1 --from-beginning
+
+For create network for consumer and mongo - use docker network create consumer-network
+
+For start consumer + mongo use docker-compose.yaml in consumer main directory
+
+For connect to mongo container: docker exec -it consumer-mongo /bin/bash and then mongo
+
+For auth in mondodb use command db.auth("user","user")
+
+For check records use command db.weather.find()
+
+
