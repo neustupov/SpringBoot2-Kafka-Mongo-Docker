@@ -23,9 +23,9 @@ Create network for consumer and mongo:
 docker network create consumer-network
 ```
 
-Start consumer + mongo: 
+Start consumer + mongo: use docker-compose.yaml in consumer main directory or
 ```sh
-docker-compose.yaml in consumer main directory
+docker-compose up
 ```
 
 Connect to mongo container: 
